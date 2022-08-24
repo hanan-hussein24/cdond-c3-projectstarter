@@ -12,15 +12,15 @@ commands:
 # #        type: string
     steps:
       - run:
-          name: Destroy environment
+#          name: Destroy environment
           when: on_fail
           command: |
 #              aws cloudformation delete-stack --stack-name <<parameters.stack-name>>
-              sudo aws cloudformation list-stacks --stack-status-filter CREATE_FAILED --query "StackSummaries[*].StackName" | perl -ne 's/\s+/\n/g;print'| sort |tail -1 | tr -d '""' > stackname.txt
-              var=$(cat stackname.txt)
-              sudo aws cloudformation delete-stack --stack-name $var
+            aws cloudformation list-stacks --stack-status-filter CREATE_FAILED --query "StackSummaries[*].StackName" | perl -ne 's/\s+/\n/g;print'| sort |tail -1 | tr -d '""' > stackname.txt
+            var=$(cat stackname.txt)
+            aws cloudformation delete-stack --stack-name $var
 #              stackname.sh
-              exit 1
+            exit 1
 
   # revert-migrations:
   #   description: Revert the last migration if successfully run in the current workflow.
