@@ -170,7 +170,11 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
 
-      - destroy-environment
+      - destroy-environment:
+          stack-name: 
+            command: |
+              var = $(aws cloudformation list-stacks --stack-status-filter CREATE_FAILED --query "StackSummaries[*].StackName" | perl -ne 's/\s+/\n/g;print'| sort |tail -1 | tr -d '""' > stackname.txt)
+              aws cloudformation delete-stack --stack-name $var
       # Here's where you will add some code to rollback on failure      
 
 #   configure-infrastructure:
