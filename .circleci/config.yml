@@ -16,7 +16,7 @@ commands:
           when: on_fail
           script: |
 #            aws cloudformation delete-stack --stack-name <<parameters.stack-name>>
-            ./stackname.sh
+              stackname.sh
 #            exit 1
 
   # revert-migrations:
