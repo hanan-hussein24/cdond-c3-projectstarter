@@ -6,18 +6,20 @@ orbs:
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-    parameters:
-      stack-name:
-        description: Name of the CloudFormation stack
-        type: string
+#     parameters:
+#       stack-name:
+#         description: Name of the CloudFormation stack
+# #        type: string
     steps:
       - run:
-          name: Destroy environments
+          name: Destroy environment
           when: on_fail
-          command: |
+#          command: |
 #            aws cloudformation delete-stack --stack-name <<parameters.stack-name>>
-            ./stackname.sh
-            exit 1
+          command: <<include(scripts/stackname.sh)>>
+
+#            ./stackname.sh
+#            exit 1
 
   # revert-migrations:
   #   description: Revert the last migration if successfully run in the current workflow.
