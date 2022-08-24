@@ -2,25 +2,38 @@ version: 2.1
 
 
 
-
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-#     parameters:
-#       stack-name:
-#         description: Name of the CloudFormation stack
-# #        type: string
+    parameters:
+      # Add parameter here   
     steps:
       - run:
-          name: Destroy environments
+          name: Desstroy environments
           when: on_fail
           command: |
-#              aws cloudformation delete-stack --stack-name <<parameters.stack-name>>
-              aws cloudformation list-stacks --stack-status-filter CREATE_FAILED --query "StackSummaries[*].StackName" | perl -ne 's/\s+/\n/g;print'| sort |tail -1 | tr -d '""' > stackname.txt
-              var=$(cat stackname.txt)
-              aws cloudformation delete-stack --stack-name $var
-#              stackname.sh
-              exit 1
+               aws cloudformation list-stacks --stack-status-filter CREATE_FAILED --query "StackSummaries[*].StackName" | perl -ne 's/\s+/\n/g;print'| sort |tail -1 | tr -d '""' > stackname.txt
+               var=$(cat stackname.txt)
+               aws cloudformation delete-stack --stack-name $var
+            exit 1
+# commands:
+#   destroy-environment:
+#     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+# #     parameters:
+# #       stack-name:
+# #         description: Name of the CloudFormation stack
+# # #        type: string
+#     steps:
+#       - run:
+#           name: Destroy environments
+#           when: on_fail
+#           command: |
+# #              aws cloudformation delete-stack --stack-name <<parameters.stack-name>>
+#               aws cloudformation list-stacks --stack-status-filter CREATE_FAILED --query "StackSummaries[*].StackName" | perl -ne 's/\s+/\n/g;print'| sort |tail -1 | tr -d '""' > stackname.txt
+#               var=$(cat stackname.txt)
+#               aws cloudformation delete-stack --stack-name $var
+# #              stackname.sh
+#               exit 1
 
   # revert-migrations:
   #   description: Revert the last migration if successfully run in the current workflow.
