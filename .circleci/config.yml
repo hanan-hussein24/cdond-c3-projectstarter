@@ -14,11 +14,9 @@ commands:
       - run:
           name: Destroy environment
           when: on_fail
-#          command: |
+          script: |
 #            aws cloudformation delete-stack --stack-name <<parameters.stack-name>>
-          command: <<include(scripts/stackname.sh)>>
-
-#            ./stackname.sh
+            ./stackname.sh
 #            exit 1
 
   # revert-migrations:
