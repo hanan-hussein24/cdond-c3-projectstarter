@@ -136,7 +136,7 @@ jobs:
 
   deploy-infrastructure:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.7-alpine
     steps:
       - checkout
       - run:
