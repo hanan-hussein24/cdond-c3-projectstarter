@@ -139,8 +139,13 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - run: yum install -y tar gzip
-      - run:
+
+      # - run:
+      #     name: Install dependencies
+      #     command: |
+      #       apk add --update tar gzip ansible
+      #       pip install awscli
+          
           name: Ensure back-end infrastructure exists
           command: |
             aws cloudformation deploy \
@@ -179,7 +184,9 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: python:3.7-alpine
+        environment:
+          ANSIBLE_HOST_KEY_CHECKING: "no"
     steps:
       - checkout
       - add_ssh_keys:
@@ -195,7 +202,7 @@ jobs:
           name: Configure server
           command: |
             cd .circleci/ansible
-            ansible-playbook -i inventory.txt configure-server.yml
+            ansible-playbook -i inventory.txt configure-server.yml -vvvv
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
           stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" 
