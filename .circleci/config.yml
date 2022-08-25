@@ -139,13 +139,12 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-
-      # - run:
+      - run:
       #     name: Install dependencies
       #     command: |
       #       apk add --update tar gzip ansible
       #       pip install awscli
-          
+
           name: Ensure back-end infrastructure exists
           command: |
             aws cloudformation deploy \
