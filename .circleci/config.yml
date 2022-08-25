@@ -145,6 +145,7 @@ jobs:
             apk add --update tar gzip ansible
             pip install awscli
 
+      - run:
           name: Ensure back-end infrastructure exists
           command: |
             aws cloudformation deploy \
