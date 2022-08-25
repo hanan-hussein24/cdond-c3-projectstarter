@@ -140,10 +140,10 @@ jobs:
     steps:
       - checkout
       - run:
-      #     name: Install dependencies
-      #     command: |
-      #       apk add --update tar gzip ansible
-      #       pip install awscli
+          name: Install dependencies
+          command: |
+            apk add --update tar gzip ansible
+            pip install awscli
 
           name: Ensure back-end infrastructure exists
           command: |
