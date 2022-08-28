@@ -173,9 +173,9 @@ jobs:
               --region us-east-1 --output text >> inventory.txt
               
       - persist_to_workspace:
-          root: .
+          root: ~/
           paths:
-            - ./.circleci/ansible/
+            - cdond-c3-projectstarter/.circleci/ansible/inventory.txt
 
       # Here's where you will add some code to rollback on failure      
       - destroy-environment:
