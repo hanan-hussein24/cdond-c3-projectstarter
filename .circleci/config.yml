@@ -186,24 +186,27 @@ jobs:
   configure-infrastructure:
     docker:
       - image: python:3.7-alpine
-        # environment:
-        #   ANSIBLE_HOST_KEY_CHECKING: "no" ...... create file ansible.cfg
+        environment:
+          ANSIBLE_HOST_KEY_CHECKING: "no"
     steps:
       - checkout
-      - add_ssh_keys:
-          fingerprints: ["c8:92:15:8e:d0:ac:7d:f0:f4:12:87:00:cb:e5:70:21"]
-      - attach_workspace:
-          at: ~/
+      
       - run:
           name: Install dependencies
           command: |
             apk add --update tar gzip ansible openssh-client
             pip install awscli 
+
+      - add_ssh_keys:
+          fingerprints: ["c8:92:15:8e:d0:ac:7d:f0:f4:12:87:00:cb:e5:70:21"]
+      - attach_workspace:
+          at: ~/
+
       - run:
           name: Configure server
           command: |
             cd .circleci/ansible
-            ansible-playbook -i inventory.txt configure-server.yml -vvvv
+            ansible-playbook -vvvv -i inventory.txt configure-server.yml
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
           stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" 

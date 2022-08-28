@@ -6,7 +6,7 @@
   become: true
   become_method: sudo
   become_user: root  
-  gather_facts: false
+  gather_facts: no
   vars:
     - ansible_python_interpreter: /usr/bin/python3
     - ansible_host_key_checking: false
@@ -22,7 +22,7 @@
         name:
           - python3
           - python3-pip
-          - python-pip
+
         state: present
         update_cache: yes
 
