@@ -1,6 +1,7 @@
 version: 2.1
 
-
+executors:
+  working_directory: /home/hanan/AWS/Projects/Project3/cdond-c3-projectstarter
 
 
 commands:
@@ -167,10 +168,10 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            echo "[web]" >> .circleci/ansible/inventory.txt
+            echo "[web]" > ~/inventory.txt
             aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --region us-east-1 --output text >> .circleci/ansible/inventory.txt
+              --region us-east-1 --output text >> ~/inventory.txt
               
       - persist_to_workspace:
           root: ~/
