@@ -1,7 +1,5 @@
 version: 2.1
 
-executors:
-  working_directory: /home/hanan/AWS/Projects/Project3/cdond-c3-projectstarter
 
 
 commands:
