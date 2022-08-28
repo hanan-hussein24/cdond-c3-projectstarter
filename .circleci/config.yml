@@ -167,15 +167,15 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            echo "[web]" > ~/inventory.txt
+            echo "[web]" > .circleci/ansible/inventory.txt
             aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --region us-east-1 --output text >> ~/inventory.txt
+              --region us-east-1 --output text >> .circleci/ansible/inventory.txt
               
       - persist_to_workspace:
           root: ~/
           paths:
-            - inventory.txt
+            - cdond-c3-projectstarter/.circleci/ansible/inventory.txt
 
       # Here's where you will add some code to rollback on failure      
       - destroy-environment:
