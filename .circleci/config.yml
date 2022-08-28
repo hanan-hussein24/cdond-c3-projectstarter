@@ -142,7 +142,9 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yum install -y tar gzip ansible openssh-client
+            yum install -y tar gzip
+            yum install -y openssh 
+            yum install -y openssh-clients
 
       - run:
           name: Ensure back-end infrastructure exists
@@ -171,9 +173,9 @@ jobs:
               --region us-east-1 --output text >> inventory.txt
               
       - persist_to_workspace:
-          root: ~/
+          root: ~/Project3
           paths:
-            - AWS/Projects/Project3/projectcdond-c3-projectstarter/.circleci/ansible/inventory.txt
+            - cdond-c3-projectstarter/.circleci/ansible/inventory.txt
 
       # Here's where you will add some code to rollback on failure      
       - destroy-environment:
