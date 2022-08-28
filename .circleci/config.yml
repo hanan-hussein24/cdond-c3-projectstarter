@@ -143,8 +143,8 @@ jobs:
           name: Install dependencies
           command: |
             yum install -y tar gzip
-            yum install openssh 
-            yum install openssh-client
+            yum install -y openssh 
+            yum install -y openssh-client
 
       - run:
           name: Ensure back-end infrastructure exists
