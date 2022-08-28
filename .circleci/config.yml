@@ -144,7 +144,7 @@ jobs:
           command: |
             yum install -y tar gzip
             yum install -y openssh 
-            yum install -y openssh-client
+            yum install -y openssh-clients
 
       - run:
           name: Ensure back-end infrastructure exists
