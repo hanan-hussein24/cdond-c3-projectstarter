@@ -216,15 +216,21 @@ jobs:
       
   run-migrations:
     docker:
-      - image: circleci/node:13.8.0
+      - image: python:3.7-alpine
     steps:
       - checkout
       - restore_cache:
           keys: [backend-build]
 
       - run:
-          name: Run migrations
+          name: Install dependencies
           command: |
+            apk add --update tar gzip curl nodejs npm zip
+            pip install awscli 
+
+      - run:
+          name: Run migrations
+          command: |          
             cd backend
             npm install
 
@@ -266,15 +272,27 @@ jobs:
 #       - run:
 #           name: Get backend url
 #           command: |
-#             # your code here
-#             export API_URL="http://${BACKEND_IP}:3030"
-#             echo "${API_URL}"
+              # export BACKEND_IP=$(aws ec2 describe-instances \
+              # --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              # --region us-east-1 --output text)
+              # export API_URL="http://${BACKEND_IP}:3030"
+              # echo "API_URL = ${API_URL}"
+              # echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+              # cat frontend/.env 
 #       - run:
 #           name: Deploy frontend objects
 #           command: |
-#             # your code here
+              # cd frontend
+              # npm install
+              # npm run build
+              # tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+              # aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 #       # Here's where you will add some code to rollback on failure      
-                    
+      # - destroy-environment:
+      #     stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"       
+      # - destroy-environment:
+      #     stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" 
+            
 #   deploy-backend:
 #     docker:
 #       # Docker image here that supports Ansible
