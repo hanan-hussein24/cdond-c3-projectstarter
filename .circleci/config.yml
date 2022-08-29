@@ -239,7 +239,7 @@ jobs:
       
 
       - run:
-          name: Send migration results to memstash
+          name: Send migration results to kvdb
           command: |
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
@@ -255,51 +255,60 @@ jobs:
           stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" 
    
 
-#   deploy-frontend:
-#     docker:
-        # - image: amazon/aws-cli
-#     steps:
-      # - checkout
-      # - attach_workspace:
-      #     at: ~/
-#       - run:
-#           name: Install dependencies
-#           command: |
-            # yum install -y nodejs npm
-            # yum install -y awscli
-            # yum install -y pyhton3
-            # yum install -y ansible
-#       - run:
-#           name: Get backend url
-#           command: |
-              # export BACKEND_IP=$(aws ec2 describe-instances \
-              # --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              # --region us-east-1 --output text)
-              # export API_URL="http://${BACKEND_IP}:3030"
-              # echo "API_URL = ${API_URL}"
-              # echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-              # cat frontend/.env 
-#       - run:
-#           name: Deploy frontend objects
-#           command: |
-              # cd frontend
-              # npm install
-              # npm run build
-              # tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-              # aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-#       # Here's where you will add some code to rollback on failure      
-      # - destroy-environment:
-      #     stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"       
-      # - destroy-environment:
-      #     stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" 
+  deploy-frontend:
+    docker:
+      - image: python:3.7-alpine
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update tar gzip curl nodejs npm zip
+            pip install awscli 
+      - run:
+          name: Get backend url
+          command: |
+              export BACKEND_IP=$(aws ec2 describe-instances \
+                --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                --region us-east-1 --output text)
+              export API_URL="http://${BACKEND_IP}:3030"
+              echo "API_URL = ${API_URL}"
+              echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+              cat frontend/.env 
+      - run:
+          name: Deploy frontend objects
+          command: |
+              cd frontend
+              npm install
+              npm run build
+              tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+              aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+
+      - destroy-environment:
+          stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"       
+      - destroy-environment:
+          stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" 
+      # Here's where you will add some code to rollback on failure      
             
 #   deploy-backend:
 #     docker:
 #       # Docker image here that supports Ansible
 #     steps:
-#       # Checkout code from git
-#       # Add ssh keys with fingerprint
-#       # attach workspace
+      # - checkout
+
+      # - run:
+      #     name: Install dependencies
+      #     command: |
+      #       apk add --update tar gzip nodejs npm ansible openssh-client
+      #       pip install awscli 
+
+      # - add_ssh_keys:
+      #     fingerprints: ["c8:92:15:8e:d0:ac:7d:f0:f4:12:87:00:cb:e5:70:21"]
+      # - attach_workspace:
+      #     at: ~/
+
 #       - run:
 #           name: Install dependencies
 #           command: |
@@ -390,8 +399,8 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
+      - deploy-frontend:
+          requires: [run-migrations]
       # - deploy-backend:
       #     requires: [run-migrations]
       # - smoke-test:
