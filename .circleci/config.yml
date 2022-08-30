@@ -300,7 +300,7 @@ jobs:
     docker:
       - image: python:3.7-alpine
     steps:
-      #- checkout
+      - checkout
 
       - run:
           name: Install dependencies
@@ -308,7 +308,7 @@ jobs:
             apk add --update tar gzip nodejs npm ansible openssh-client
     # pip install awscli 
 
-      - add_ssh_keys:
+      #- add_ssh_keys:
           # fingerprints: ["c8:92:15:8e:d0:ac:7d:f0:f4:12:87:00:cb:e5:70:21"]
       - attach_workspace:
           at: ~/
