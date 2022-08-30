@@ -300,23 +300,26 @@ jobs:
     docker:
       - image: python:3.7-alpine
     steps:
-      - checkout
+      #- checkout
 
       - run:
           name: Install dependencies
           command: |
             apk add --update tar gzip nodejs npm ansible openssh-client
-            pip install awscli 
+    # pip install awscli 
 
       - add_ssh_keys:
-          fingerprints: ["c8:92:15:8e:d0:ac:7d:f0:f4:12:87:00:cb:e5:70:21"]
+          # fingerprints: ["c8:92:15:8e:d0:ac:7d:f0:f4:12:87:00:cb:e5:70:21"]
       - attach_workspace:
           at: ~/
 
       - run:
           name: Deploy backend
           command: |
-           
+            cd backend
+            npm i
+            npm run build
+            cd ..           
             tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
@@ -324,10 +327,7 @@ jobs:
             ansible-playbook -i inventory.txt deploy-backend.yml
       
       # Here's where you will add some code to rollback on failure  
-      # cd backend
-      # npm i
-      # npm run build
-      # cd ..
+      
       - destroy-environment:
           stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"       
       - destroy-environment:
