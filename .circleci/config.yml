@@ -302,16 +302,16 @@ jobs:
     steps:
       - checkout
 
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update tar gzip nodejs npm ansible openssh-client
+      # - run:
+      #     name: Install dependencies
+      #     command: |
+      #       apk add --update tar gzip nodejs npm ansible openssh-client
     # pip install awscli 
 
       #- add_ssh_keys:
           # fingerprints: ["c8:92:15:8e:d0:ac:7d:f0:f4:12:87:00:cb:e5:70:21"]
-      - attach_workspace:
-          at: ~/
+      # - attach_workspace:
+      #     at: ~/
 
       - run:
           name: Deploy backend
@@ -327,13 +327,13 @@ jobs:
             ansible-playbook -i inventory.txt deploy-backend.yml
       
       # Here's where you will add some code to rollback on failure  
-      
+      - revert-migrations
       - destroy-environment:
           stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"       
       - destroy-environment:
           stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" 
-      - revert-migrations
-    
+
+
   
 #   smoke-test:
 #     docker:
