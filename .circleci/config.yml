@@ -24,15 +24,15 @@ commands:
     parameters:
        SUCCESS:
          description: Test successful migration
-         type: integer
-         default: 1
+         type: string
+         default: ""
     steps:
       - run:
           name: Revert migrations
           when: on_fail          
           command: |
 
-            if(( $SUCCESS==1 )); 
+            if(( $SUCCESS=="1" )); 
             then
               cd ~/project/backend
               npm install
