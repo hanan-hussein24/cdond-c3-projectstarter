@@ -316,10 +316,7 @@ jobs:
       - run:
           name: Deploy backend
           command: |
-            cd backend
-            npm i
-            npm run build
-            cd ..
+           
             tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
@@ -327,7 +324,10 @@ jobs:
             ansible-playbook -i inventory.txt deploy-backend.yml
       
       # Here's where you will add some code to rollback on failure  
-
+      # cd backend
+      # npm i
+      # npm run build
+      # cd ..
       - destroy-environment:
           stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"       
       - destroy-environment:
