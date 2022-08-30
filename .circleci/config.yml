@@ -21,17 +21,17 @@ commands:
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
-    # parameters:
-    #    SUCCESS:
-    #      description: Test successful migration
-    #      type: integer
-    #      default: 1  
+    parameters:
+       SUCCESS:
+         description: Test successful migration
+         type: integer
+         default: 1
     steps:
       - run:
           name: Revert migrations
           when: on_fail          
           command: |
-            SUCCESS = ${curl https://kvdb.io/SyLHeNDmDNrwJT9kwTeiMc/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'}
+
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -247,10 +247,15 @@ jobs:
             then
 
                 curl https://kvdb.io/SyLHeNDmDNrwJT9kwTeiMc/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+                curl --insecure https://Kvdb.io/Xhttps://kvdb.io/SyLHeNDmDNrwJT9kwTeiMc/migration_$\{CIRCLE_WORKFLOW_ID:0:7\}
+                echo "1" > ~/project/.circleci/migration-success.txt
             fi  
       # If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
       #Here's where you will add some code to rollback on failure
-      
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/migration-success.txt
       - destroy-environment:
           stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"       
       - destroy-environment:
@@ -293,7 +298,8 @@ jobs:
       - destroy-environment:
           stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" 
 
-      - revert-migrations
+      - revert-migrations:
+          SUCCESS: "cat ~/project/.circleci/migration-success.txt"
       # Here's where you will add some code to rollback on failure      
             
   deploy-backend:
@@ -332,6 +338,8 @@ jobs:
           stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"       
       - destroy-environment:
           stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" 
+      - revert-migrations:
+          SUCCESS: "cat ~/project/.circleci/migration-success.txt"    
 
 
   
