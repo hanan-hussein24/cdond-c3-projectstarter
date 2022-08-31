@@ -273,7 +273,7 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update tar gzip curl nodejs npm zip
-            pip install awscli 
+            pip install awscli
       - run:
           name: Get backend url
           command: |
@@ -283,7 +283,7 @@ jobs:
               export API_URL="http://${BACKEND_IP}:3030"
               echo "API_URL = ${API_URL}"
               echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-              cat frontend/.env 
+              cat frontend/.env
       - run:
           name: Deploy frontend objects
           command: |
@@ -294,30 +294,28 @@ jobs:
               aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 
       - destroy-environment:
-          stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"       
+          stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"      
       - destroy-environment:
-          stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" 
+          stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
 
       - revert-migrations:
           SUCCESS: "cat ~/project/.circleci/migration-success.txt"
-      # Here's where you will add some code to rollback on failure      
+      # Here's where you will add some code to rollback on failure 
             
   deploy-backend:
     docker:
       - image: python:3.7-alpine
     steps:
       - checkout
-
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       apk add --update tar gzip nodejs npm ansible openssh-client
-    # pip install awscli 
-
-      #- add_ssh_keys:
-          # fingerprints: ["c8:92:15:8e:d0:ac:7d:f0:f4:12:87:00:cb:e5:70:21"]
-      # - attach_workspace:
-      #     at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update tar gzip nodejs npm ansible openssh-client
+            pip install awscli
+      - add_ssh_keys:
+          fingerprints: ["c8:92:15:8e:d0:ac:7d:f0:f4:12:87:00:cb:e5:70:21"]
+      - attach_workspace:
+          at: ~/
 
       - run:
           name: Deploy backend
@@ -325,46 +323,70 @@ jobs:
             cd backend
             npm i
             npm run build
-            cd ..           
+            cd ..
             tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
       
-      # Here's where you will add some code to rollback on failure  
-      - revert-migrations
+      # Here's where you will add some code to rollback on failure 
+
+      - destroy-environment:
+          stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+      - destroy-environment:
+          stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+      - revert-migrations:
+          SUCCESS: "cat ~/project/.circleci/migration-success.txt"
+
+
+  
+  smoke-test:
+    docker:
+      - image: python:3.7-alpine
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update tar gzip curl nodejs npm zip
+            pip install awscli
+      - attach_workspace:
+          at: ~/
+      
+      # - run:
+      #     name: Get backend url
+      #     command: |
+
+      - run:
+          name: Backend smoke test.
+          command: |
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+              return 0
+            else
+              return 1
+            fi
+      - run:
+          name: Frontend smoke test.
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
+            then
+              return 1
+            else
+              return 1
+            fi
       - destroy-environment:
           stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"       
       - destroy-environment:
           stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" 
       - revert-migrations:
-          SUCCESS: "cat ~/project/.circleci/migration-success.txt"    
-
-
-  
-#   smoke-test:
-#     docker:
-#       # Lightweight Docker image 
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Get backend url
-#           command: |
-#             # your code here
-#       - run:
-#           name: Backend smoke test.
-#           command: |
-#             # your code here
-#       - run:
-#           name: Frontend smoke test.
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+          SUCCESS: "cat ~/project/.circleci/migration-success.txt"           
+  # Here's where you will add some code to rollback on failure  
 
 #   cloudfront-update:
 #     docker:
