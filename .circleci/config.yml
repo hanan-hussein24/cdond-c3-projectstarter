@@ -6,17 +6,17 @@ commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
-       stack-name:
-         description: Name of the CloudFormation stack
-         type: string
-         default: ""
+      circleworkflow_id:
+        type: string
+
     steps:
       - run:
           name: Desstroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name <<parameters.stack-name>>
-          
+            aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.circleworkflow_id>>
+            aws s3 rm s3://udapeople-<<parameters.circleworkflow_id>> --recursive
+            aws cloudformation delete-stack --stack-name udapeople-frontend-<<parameters.circleworkflow_id>>
 
 
   revert-migrations:
@@ -180,10 +180,7 @@ jobs:
 
       # Here's where you will add some code to rollback on failure      
       - destroy-environment:
-          stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" 
-
-      - destroy-environment:
-          stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" 
+          circleworkflow_id: ${CIRCLE_WORKFLOW_ID} 
 
   configure-infrastructure:
     docker:
@@ -211,10 +208,7 @@ jobs:
             ansible-playbook -vvvv -i inventory.txt configure-server.yml
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
-          stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" 
-      - destroy-environment:
-          stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" 
-
+          circleworkflow_id: ${CIRCLE_WORKFLOW_ID}
       
   run-migrations:
     docker:
@@ -257,10 +251,7 @@ jobs:
           paths:
             - project/.circleci/migration-success.txt
       - destroy-environment:
-          stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"       
-      - destroy-environment:
-          stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" 
-   
+          circleworkflow_id: ${CIRCLE_WORKFLOW_ID}   
 
   deploy-frontend:
     docker:
@@ -294,10 +285,7 @@ jobs:
               aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 
       - destroy-environment:
-          stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"      
-      - destroy-environment:
-          stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
-
+          circleworkflow_id: ${CIRCLE_WORKFLOW_ID}
       - revert-migrations:
           SUCCESS: "cat ~/project/.circleci/migration-success.txt"
       # Here's where you will add some code to rollback on failure 
@@ -333,14 +321,12 @@ jobs:
       # Here's where you will add some code to rollback on failure 
 
       - destroy-environment:
-          stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
-      - destroy-environment:
-          stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+          circleworkflow_id: ${CIRCLE_WORKFLOW_ID} 
       - revert-migrations:
           SUCCESS: "cat ~/project/.circleci/migration-success.txt"
-
-
   
+
+
   smoke-test:
     docker:
       - image: python:3.7-alpine
@@ -361,6 +347,9 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
+            export BACKEND_IP=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --region us-east-1 --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
@@ -381,9 +370,7 @@ jobs:
               return 1
             fi
       - destroy-environment:
-          stack-name: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"       
-      - destroy-environment:
-          stack-name: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" 
+          circleworkflow_id: ${CIRCLE_WORKFLOW_ID} 
       - revert-migrations:
           SUCCESS: "cat ~/project/.circleci/migration-success.txt"           
   # Here's where you will add some code to rollback on failure  
