@@ -344,7 +344,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update tar gzip curl nodejs npm zip awscli
+            apk add --update tar gzip curl nodejs npm zip
             pip install awscli
       - attach_workspace:
           at: ~/
