@@ -279,6 +279,10 @@ jobs:
               echo "API_URL = ${API_URL}"
               echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
               cat frontend/.env
+              npm install
+              npm run build
+              npm run build:prod
+
       - run:
           name: Deploy frontend objects
           command: |
@@ -338,7 +342,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update tar gzip curl nodejs npm zip
+            apk add --update tar gzip curl nodejs npm zip awscli
             pip install awscli
       - attach_workspace:
           at: ~/
