@@ -356,8 +356,10 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            
-            API_URL=$(curl curl --insecure  https://kvdb.io/9GE4jRtKznmVKRfvdBABBe/migration-${CIRCLE_WORKFLOW_ID:0:7})  
+            export BACKEND_IP=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --region us-east-1 --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             if curl -s "${API_URL}/api/status" | grep "ok"
             then
@@ -365,11 +367,7 @@ jobs:
             else
               return 1
             fi
-  # export BACKEND_IP=$(aws ec2 describe-instances \
-  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-  #             --region us-east-1 --output text)
-  # export API_URL="http://${BACKEND_IP}:3030"
-
+  # API_URL=$(curl curl --insecure  https://kvdb.io/9GE4jRtKznmVKRfvdBABBe/migration-${CIRCLE_WORKFLOW_ID:0:7})
   # echo "${API_URL}"
       - run:
           name: Frontend smoke test.
