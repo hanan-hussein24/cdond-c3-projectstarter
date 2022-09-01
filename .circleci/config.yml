@@ -173,7 +173,7 @@ jobs:
           command: |
             echo "[web]" > .circleci/ansible/inventory.txt
             BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
-              --filters "Name=tag:Name,Value=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --region us-east-1 --output text)
             echo $BACKEND_PUBLIC_IP >> .circleci/ansible/inventory.txt
