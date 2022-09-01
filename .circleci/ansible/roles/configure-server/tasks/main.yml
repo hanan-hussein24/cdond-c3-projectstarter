@@ -26,8 +26,8 @@
   become: true
   shell:
     curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
-    node --version
-    npm --version
+    # node --version
+    # npm --version
 
 - name: "install Node.js 13"
   become: true
