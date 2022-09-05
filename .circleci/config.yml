@@ -2,22 +2,22 @@ version: 2.1
 
 
 
-commands:
-  destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-    parameters:
-      circleworkflow_id:
-        type: string
+# commands:
+#   destroy-environment:
+#     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+#     parameters:
+#       circleworkflow_id:
+#         type: string
 
-    steps:
-      - run:
-          name: Desstroy environments
-          when: on_fail
-          command: |
-            echo "Destroying environment: <<parameters.circleworkflow_id>> "
-            aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.circleworkflow_id>>
-            aws s3 rm s3://udapeople-<<parameters.circleworkflow_id>> --recursive
-            aws cloudformation delete-stack --stack-name udapeople-frontend-<<parameters.circleworkflow_id>>
+#     steps:
+#       - run:
+#           name: Desstroy environments
+#           when: on_fail
+#           command: |
+#             echo "Destroying environment: <<parameters.circleworkflow_id>> "
+#             aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.circleworkflow_id>>
+#             aws s3 rm s3://udapeople-<<parameters.circleworkflow_id>> --recursive
+#             aws cloudformation delete-stack --stack-name udapeople-frontend-<<parameters.circleworkflow_id>>
 
 
   # revert-migrations:
@@ -57,9 +57,9 @@ jobs:
             cd frontend
             npm install
             npm run build
-      # - save_cache:
-      #     paths: [frontend/node_modules]
-      #     key: frontend-build
+      - save_cache:
+          paths: [frontend/node_modules]
+          key: frontend-build
       
 
   build-backend:
@@ -75,9 +75,9 @@ jobs:
             cd backend
             npm install
             npm run build
-      # - save_cache:
-      #     paths: [backend/node_modules]
-      #     key: backend-build
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-build
 
 
 #   test-frontend:
